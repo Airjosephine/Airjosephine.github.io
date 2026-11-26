@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>首尔四天</title>
+<style>
+:root{
+  --bg:#EEF2F4; --surface:#FFFFFF; --ink:#16233B; --muted:#5B677A; --line:#D3DAE2;
+  --me:#16233B; --me-ink:#FFFFFF; --friend:#E3A22F; --friend-ink:#2A1D03; --link:#2E6B5C; --chip:#E1E8ED;
+  --serif:"Songti SC","Noto Serif CJK SC","Source Han Serif SC","STSong","SimSun",serif;
+  --sans:-apple-system,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1626; --surface:#17213A; --ink:#E8EDF5; --muted:#9AA7BC; --line:#2A3652;
+    --me:#7FA6F5; --me-ink:#0B1226; --friend:#E9B04B; --friend-ink:#241A04; --link:#7CC4AE; --chip:#222E4A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1626; --surface:#17213A; --ink:#E8EDF5; --muted:#9AA7BC; --line:#2A3652;
+  --me:#7FA6F5; --me-ink:#0B1226; --friend:#E9B04B; --friend-ink:#241A04; --link:#7CC4AE; --chip:#222E4A;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 var(--sans);-webkit-text-size-adjust:100%}
+a{color:var(--link);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--friend);outline-offset:2px}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px}
+header.hero{padding:56px 0 28px}
+h1{font:700 clamp(34px,8vw,60px)/1.15 var(--serif);margin:0 0 12px;letter-spacing:.02em}
+.lede{color:var(--muted);margin:0;max-width:34em}
+nav.top{display:flex;gap:18px;flex-wrap:wrap;margin-top:20px;font-size:15px}
+
+/* two travellers ribbon */
+.ribbon{margin:28px 0 8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 14px 18px}
+.rgrid{display:grid;grid-template-columns:64px repeat(5,1fr);gap:8px 4px;align-items:center}
+.rgrid .d{font-size:13px;color:var(--muted);text-align:center;line-height:1.3}
+.rgrid .d b{display:block;font:700 18px/1.2 var(--serif);color:var(--ink)}
+.rgrid .who{font-size:13px;color:var(--muted)}
+.bar{border-radius:5px;padding:5px 8px;font-size:12.5px;line-height:1.35;min-height:34px;display:flex;align-items:center}
+.bar.me{background:var(--me);color:var(--me-ink)}
+.bar.fly{background:transparent;color:var(--ink);border:2px dashed var(--me);font-weight:600}
+.bar.friend{background:var(--friend);color:var(--friend-ink)}
+.bar.together{border:2px solid var(--friend);color:var(--ink);justify-content:center;background:transparent}
+.rnote{font-size:13px;color:var(--muted);margin:10px 0 0}
+
+section{padding:36px 0 8px}
+h2{font:700 28px/1.3 var(--serif);margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 20px;font-size:15px}
+
+/* days */
+.day{background:var(--surface);border:1px solid var(--line);border-radius:8px;margin:0 0 14px;overflow:hidden}
+.day>summary{list-style:none;cursor:pointer;padding:16px 18px;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+.day>summary::-webkit-details-marker{display:none}
+.day>summary::after{content:"＋";margin-left:auto;color:var(--muted);font-size:18px}
+.day[open]>summary::after{content:"－"}
+.date{font:700 24px/1.2 var(--serif)}
+.wk{color:var(--muted);font-size:14px}
+.theme{font-size:15px}
+.items{padding:0 18px 14px;margin:0;list-style:none}
+.items li{display:grid;grid-template-columns:68px 1fr;gap:4px 12px;padding:12px 0;border-top:1px solid var(--line)}
+.t{color:var(--muted);font-size:14px}
+.items .what{margin:0}
+.items small{display:block;color:var(--muted);font-size:14px;line-height:1.55;margin-top:2px}
+.tag{display:inline-block;font-size:12px;background:var(--chip);border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:1px}
+.tag.warn{background:var(--friend);color:var(--friend-ink)}
+
+/* map */
+.mapbox{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.mapbox iframe{display:block;width:100%;height:560px;max-height:75vh;min-height:360px;border:0}
+.maplink{margin:10px 0 0;font-size:14px;color:var(--muted)}
+
+/* food list */
+.tools{display:flex;flex-direction:column;gap:12px;margin:0 0 14px}
+input[type=search]{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:3px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.count{color:var(--muted);font-size:14px}
+.list{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--line)}
+.list li{display:grid;grid-template-columns:1fr auto;gap:2px 16px;padding:13px 0;border-bottom:1px solid var(--line)}
+.list .n{font-weight:600}
+.list .c{color:var(--muted);font-size:13px}
+.list .note{grid-column:1/-1;color:var(--muted);font-size:14.5px;line-height:1.6}
+.golinks{display:flex;gap:12px;font-size:14px;white-space:nowrap;align-items:baseline}
+.nv{font-size:12px;border:1px solid var(--line);border-radius:4px;padding:0 5px;margin-left:6px;text-decoration:none;white-space:nowrap}
+.golinks .nv{margin-left:0;font-size:13px;padding:0 6px}
+.empty{padding:24px 0;color:var(--muted)}
+footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
+@media (max-width:560px){
+  .rgrid{grid-template-columns:44px repeat(5,1fr)}
+  .bar{font-size:11.5px;padding:4px 5px}
+  .items li{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>首尔四天</h1>
+  <p class="lede">11月27日至12月1日。Jo 从多伦多出发，Long 从北京飞来，28日晚在首尔汇合，12月1日 Long 先回，Jo 继续留在首尔。</p>
+  <nav class="top" aria-label="页面导航">
+    <a href="../">所有旅行</a><a href="#flights">航班</a><a href="#days">每日行程</a><a href="#map">地图</a><a href="#food">餐厅清单</a>
+  </nav>
+
+  <div class="ribbon" role="img" aria-label="两个人的时间线：Jo 11月27日出发、28日抵达首尔并留到12月1日之后；Long 28日从北京抵达、12月1日返程；两人28日晚汇合后同行。">
+    <div class="rgrid">
+      <div></div>
+      <div class="d"><b>27</b>周五</div><div class="d"><b>28</b>周六</div><div class="d"><b>29</b>周日</div><div class="d"><b>30</b>周一</div><div class="d"><b>12/1</b>周二</div>
+
+      <div class="who">Jo</div>
+      <div class="bar fly" style="grid-column:2/3">AC61 在路上</div>
+      <div class="bar me" style="grid-column:3/7">28日 17:25 抵达，12/1 之后也留下</div>
+
+      <div class="who">Long</div>
+      <div class="bar friend" style="grid-column:3/7">28日 14:40 抵达（北京出发），12/1 15:40 返程</div>
+
+      <div class="who">同行</div>
+      <div class="bar together" style="grid-column:3/7">28日晚汇合，一起吃饭、逛街</div>
+    </div>
+    <p class="rnote">虚线是在飞机上，实心是在首尔。</p>
+  </div>
+</header>
+
+<section id="flights">
+  <h2>航班</h2>
+  <p class="sub">时间均为当地时间。时刻来自公开的冬季时刻表，请以订单和值机信息为准。</p>
+  <div class="day" style="padding:6px 18px 14px">
+    <ul class="items" style="padding:0">
+      <li style="border-top:0"><span class="t">Jo 去程</span><p class="what"><b>AC61</b> 多伦多 YYZ T1 → 仁川 ICN T1<small>11月27日（周五）13:00 起飞<br>11月28日（周六）17:25 到达，飞行约 15 小时 25 分</small></p></li>
+      <li><span class="t">Long 去程</span><p class="what"><b>MU2073</b> 北京大兴 PKX → 仁川 ICN T1<small>11月28日（周六）11:40 起飞<br>11月28日（周六）14:40 到达</small></p></li>
+      <li><span class="t">Long 返程</span><p class="what"><b>MU2074</b> 仁川 ICN T1 → 北京大兴 PKX<small>12月1日（周二）15:40 起飞<br>12月1日（周二）16:40 到达</small></p></li>
+    </ul>
+  </div>
+</section>
+
+<section id="days">
+  <h2>每日行程</h2>
+  <p class="sub">点开某一天查看细节。每个地点都能直接跳到谷歌地图。</p>
+  <div id="daylist"></div>
+</section>
+
+<section id="map">
+  <h2>地图</h2>
+  <p class="sub">所有想去的店和地点都标在这张图里，手机上可以在谷歌地图 App 中打开。</p>
+  <div class="mapbox">
+    <iframe src="https://www.google.com/maps/d/embed?mid=1qMX9NcRWo_NtN7Hy62et8xD79ZRSC6Q&amp;ehbc=2E312F" title="首尔旅行地图" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+  <p class="maplink">韩国境内 Naver 地图的店铺信息通常更全。下面的行程和餐厅清单里，每个地点旁边的“네이버”会直接在 Naver 地图中搜索该店。Naver 没有谷歌那样的嵌入式地图，所以这里只放链接。<span id="nvlist" hidden> <a id="nvlistlink" target="_blank" rel="noopener">打开我的 Naver 收藏夹</a></span></p>
+  <p class="maplink">地图没有显示？<a href="https://www.google.com/maps/d/viewer?mid=1qMX9NcRWo_NtN7Hy62et8xD79ZRSC6Q" target="_blank" rel="noopener">在谷歌地图中打开</a></p>
+</section>
+
+<section id="food">
+  <h2>餐厅清单</h2>
+  <p class="sub">共 <span id="total"></span> 家。可以搜店名、菜名，或按类型筛选。</p>
+  <div class="tools">
+    <input type="search" id="q" placeholder="搜索，例如：参鸡汤、弘大、冷面" aria-label="搜索餐厅">
+    <div class="chips" id="chips" role="group" aria-label="按类型筛选"></div>
+    <div class="count" id="count" aria-live="polite"></div>
+  </div>
+  <ul class="list" id="list"></ul>
+  <p class="empty" id="empty" hidden>没有匹配的店，换个关键词试试。</p>
+</section>
+
+
+<footer>最后更新 2026年11月26日。行程是草稿，随时会调整。</footer>
+</div>
+
+<script>
+/* Naver 地图里分享出来的收藏夹链接（可选），填在引号里就会显示在地图下方 */
+const NAVER_LIST_URL = "";
+if (NAVER_LIST_URL) { const a = document.getElementById("nvlistlink"); a.href = NAVER_LIST_URL; document.getElementById("nvlist").hidden = false; }
+
+/* ===== 行程在这里改：每天一项，items 里每条一个安排 ===== */
+const DAYS = [
+  { date:"11月27日", wk:"周五", theme:"Jo 出发",
+    items:[
+      { t:"13:00", text:"Jo 乘 AC61 从多伦多起飞", note:"跨日航班，28日 17:25 到达仁川。" }
+    ]},
+  { date:"11月28日", wk:"周六", theme:"各自到达，晚上汇合吃饭",
+    items:[
+      { t:"14:40", text:"Long 乘 MU2073 抵达仁川，先去住处放行李" },
+      { t:"17:25", text:"Jo 乘 AC61 抵达仁川，前往住处", place:"Mapo Hanwha Obelisk", q:"서울특별시 마포구 마포대로 33 마포 한화 오벨리스크", note:"落地后入境、取行李、坐车到麻浦，到住处大约要晚上 7 点半，晚饭建议订 8 点前后。" },
+      { t:"晚上", text:"汇合吃第一顿", note:"住处附近可选（都在麻浦、孔德一带）：", picks:[
+        { n:"마포나루 도화본점（Mapo Naru）", q:"서울특별시 마포구 삼개로 11" },
+        { n:"진대감 마포점（Jindaegam）", q:"서울특별시 마포구 마포대로12길 54-2" },
+        { n:"츠케루 공덕（沾面）", q:"서울특별시 마포구 도화동 560" } ]}
+    ]},
+  { date:"11月29日", wk:"周日", theme:"广藏市场，晚上看灯光秀",
+    items:[
+      { t:"白天", text:"去广藏市场吃小吃", place:"广藏市场", q:"광장시장", note:"清单里已收的几家：", picks:[
+        { n:"순희네 빈대떡（绿豆煎饼）", q:"광장시장 순희네 빈대떡" },
+        { n:"母女紫菜包饭 모녀김밥", q:"광장시장 모녀김밥" },
+        { n:"姜家炒年糕 강가네 떡볶이", q:"광장시장 강가네 떡볶이" },
+        { n:"형제육회（兄弟生拌牛肉）", q:"서울 종로구 종로 200-1" } ]},
+      { t:"傍晚", text:"坐地铁去蚕室，约 40 分钟", note:"广藏市场在钟路，乐天世界在蚕室，从西往东一路走，不绕路。" },
+      { t:"晚上", text:"乐天世界城堡灯光秀", place:"乐天世界城堡灯光秀", q:"서울 송파구 올림픽로 240", note:"圣诞活动 11月21日起。魔法城堡在园区里面，要买入园票。灯光秀的具体场次时间我没查到，去之前看乐天世界官网或 App。" }
+    ]},
+  { date:"11月30日", wk:"周一", theme:"逛街日：圣水、新沙、狎鸥亭、清潭洞、星空图书馆",
+    items:[
+      { t:"上午", text:"圣水洞逛店、喝咖啡", note:"午饭可去参鸡汤：", picks:[
+        { n:"無垢屋参鸡汤 무구옥（圣水店）", q:"서울 성동구 아차산로11길 11 1층 103호" } ]},
+      { t:"下午", text:"到新沙逛林荫道", place:"新沙林荫道", q:"가로수길", note:"想吃冷面的话放在这个时段，当作下午的一餐，不要排到晚上：", picks:[
+        { n:"江南面屋 강남면옥", q:"서울 강남구 논현로152길 34 1층", warn:"冷面加炖排骨，剩酱汁让店员炒紫菜拌饭" } ]},
+      { t:"傍晚", text:"狎鸥亭现代百货", place:"狎鸥亭现代百货", q:"서울특별시 강남구 압구정로 165", note:"店内装饰活动从11月1日持续到12月31日。30日是周一，百货店每月有一个周一休息，出发前在现代百货官网看一下狎鸥亭本店当天是否营业。" },
+      { t:"晚饭", text:"清潭洞吃韩牛", note:"在狎鸥亭往东的路上，顺路：", picks:[
+        { n:"Tteurak韩牛 뜨락", q:"서울 강남구 영동대로142길 13-3", warn:"必须提前在 Catchtable 预约" } ]},
+      { t:"饭后", text:"星空图书馆（COEX）", place:"星空图书馆", q:"별마당도서관 코엑스", note:"从清潭洞再往东约 2 公里，打车约 10 分钟。商场通常营业到晚上 10 点前后，具体时间我没核实，建议 21:00 前到。" }
+    ]},
+  { date:"12月1日", wk:"周二", theme:"Long 返程，Jo 留下",
+    items:[
+      { t:"中午", text:"一起吃午饭，送 Long 去机场", note:"Long 乘 MU2074，15:40 从仁川 T1 起飞，建议 12:30 前后出发。T1 的 Matina 贵宾厅可以吃自助（约30元人民币，安检后4楼11号或43号登机口附近，热门时段排队，早点去）。", picks:[
+        { n:"Matina贵宾厅（T1）", q:"인천공항 T1 마티나 라운지" } ]},
+      { t:"之后", text:"Jo 继续留在首尔", note:"之后的安排待补充。" }
+    ]}
+];
+
+const gm = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+const el = (tag, attrs={}, kids=[]) => {
+  const e = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)) { if (k==="text") e.textContent=v; else e.setAttribute(k,v); }
+  (Array.isArray(kids)?kids:[kids]).forEach(c => e.append(c));
+  return e;
+};
+const nm = q => "https://map.naver.com/p/search/" + encodeURIComponent(q);
+const nvLink = q => el("a",{class:"nv",href:nm(q),target:"_blank",rel:"noopener",title:"在 Naver 地图中搜索",text:"네이버"});
+const link = (text,q) => el("a",{href:gm(q),target:"_blank",rel:"noopener",text});
+const linkBoth = (text,q) => { const f = document.createDocumentFragment(); f.append(link(text,q), nvLink(q)); return f; };
+
+const dl = document.getElementById("daylist");
+DAYS.forEach(d => {
+  const det = el("details",{class:"day"});
+  if (d.open) det.setAttribute("open","");
+  det.append(el("summary",{},[
+    el("span",{class:"date",text:d.date}), el("span",{class:"wk",text:d.wk}), el("span",{class:"theme",text:d.theme})
+  ]));
+  const ul = el("ul",{class:"items"});
+  d.items.forEach(it => {
+    const body = el("p",{class:"what"});
+    body.append(it.text);
+    if (it.place) { body.append(" "); body.append(linkBoth(it.place,it.q)); }
+    if (it.note || it.picks) {
+      const s = el("small");
+      if (it.note) s.append(it.note);
+      if (it.picks) it.picks.forEach((p,i) => {
+        s.append(el("br"));
+        s.append(linkBoth(p.n,p.q));
+        if (p.warn) s.append(el("span",{class:"tag warn",text:p.warn}));
+      });
+      body.append(s);
+    }
+    ul.append(el("li",{},[el("span",{class:"t",text:it.t}), body]));
+  });
+  det.append(ul);
+  dl.append(det);
+});
+
+/* ===== 餐厅清单（数据来自 CSV：名称、地址、分类、点什么） ===== */
+const FOOD = [["뚝닭홍대 / 원조 뚝닭한마리", "서울특별시 마포구 홍익로6길 44", "正餐", "一只鸡；建议点整鸡/鸡汤类"], ["국보감 홍대본점 KUKBOGAM", "서울 마포구 와우산로 94", "正餐", "土豆脊骨汤、包五花肉、炒饭套餐"], ["어묵나라", "뚝섬역 어묵나라 ", "小吃", "鱼饼"], ["육전국밥（弘大店）", "서울 마포구 어울마당로 140", "正餐", "肉饼汤饭"], ["4시 4분", "서울 마포구 연남동 387-7 1층", "咖啡", ""], ["홍스쭈꾸미 / 홍스꺼우미（弘大本店）", "서울 마포구 어울마당로 146", "正餐", "章鱼锅、飞鱼籽炒饭"], ["Super Coffee（弘大）", "슈퍼커피 홍대입구점", "甜品", "生草莓牛奶"], ["Waffle Shop（弘大 AK Plaza）", "홍대 AK플라자 Waffle Shop", "甜品", "华夫饼"], ["시골국밥（弘大）", "시골국밥 홍대 ", "正餐", "大肠米肠汤饭"], ["경양카츠（弘大）", "경양카츠 연남점", "正餐", "芝士猪排、猪排意面套餐"], ["우진（弘大）", "우진 홍대", "正餐", "辣鸡爪"], ["홍대OLON / 원조마포OLON", "망원동 원조마포OLON ", "小吃", "炒年糕、紫菜包饭、米肠、鱼饼汤"], ["홍대족발（弘大）", "서울 마포구 양화로16길 18", "正餐", "蒜香猪蹄；另一篇提到甜辣+蒜蓉双拼"], ["완포 코리아", "서울 마포구 양화로23길 22-10", "甜品", "豆花奶茶"], ["oats", "서울 마포구 성미산로29길 29-8", "甜品", "维也纳咖啡、黄油司康"], ["솔솥 Solsot（弘大）", "서울 마포구 연남동 390-42 B1F", "正餐", "牛排釜饭；可搭配酱汁蛋液，最后做锅巴汤"], ["Anthracite Coffee Seogyo", "서울 마포구 월드컵로12길 11", "咖啡", "手冲、冷萃"], ["三德炸鸡 Samduk Chicken", "서울 마포구（首尔花园酒店对面一带）", "炸鸡", "三味炸鸡（酱油甜口+青椒蒜）、蜂蜜口味；可配鱼饼汤"], ["兄弟烤肉", "마포 형제갈비 / 형제고기", "烤肉", "韩牛拼盘、拌冷面"], ["김숙성 마포점", "서울특별시 마포구 도화길 14-1 1층 제1호", "烤肉", "韩牛、鸡蛋羹、酱蟹拌饭、芥末蘑菇酱、水芹菜虾饼"], ["궁전갈비", "서울 마포구 도화길 14-1", "烤肉", "韩牛拼盘、生牛肉、大酱汤饭、韩牛拉面、煎饼"], ["김막회", "서울 마포구 도화길 20-1", "海鲜", "厚切三文鱼、生牛肉、炸比目鱼、烤生蚝、猪蹄双拼"], ["망원곱창시장", "망원 곱창시장 ", "正餐", "牛内脏拼盘、牛小肠汤、芝士炒饭"], ["망원동칼칼칼칼칼칼칼칼칼칼칼칼칼칼칼", "서울 마포구 망원동（店名 검색）", "正餐", "刀削面"], ["이곱김밥", "이곱김밥 ", "小吃", "巨型金枪鱼紫菜包饭"], ["望远市场生腌蟹虾", "서울 마포구 포은로8길 25", "海鲜", "生腌蟹、虾"], ["Fritz Coffee（麻浦/孔德附近）", "공덕 프릳츠 커피", "咖啡", "冰美式、面包；可买咖啡豆"], ["Egg Drop（孔德附近）", "68 Mapo-daero", "住宿附近", "韩式吐司三明治"], ["麻浦阳地雪浓汤", "서울특별시 마포구 새창로 6 (도화동) | 6 Saechang-ro", "住宿附近", "1人：直接点1碗雪浓汤即可，属于很适合独行的单人餐。2人：可各点不同汤品互相尝味；想加菜再点수육（白切牛肉），先不要额外点太多。"], ["长寿韩方参鸡汤", "공덕 장수한방삼계탕", "正餐", "参鸡汤"], ["BHC（首尔）", "서울 bhc치킨", "炸鸡", "芝士粉炸鸡、双拼口味、芝士球"], ["Mega Coffee", "서울 메가커피", "甜品", "爆米花沙冰"], ["Compose Coffee", "서울 컴포즈커피 ", "甜品", "红豆年糕奶昔"], ["능동미나리（圣水）", "서울특별시 성동구 연무장길 42", "正餐", "水芹菜牛肉汤饭、生牛肉拌饭；汤饭可考虑雪花牛肉"], ["자연도소금빵（圣水）", "서울 성동구 성수동2가 321-74", "甜品", "现烤盐面包"], ["vetiver", "서울 성동구 성덕정11길 18 1층", "甜品", "黑芝麻维也纳、华夫饼"], ["계자람", "서울 성동구 성덕정17길 5 1층", "正餐", "烤鸡、辣鸡爪"], ["조조칼국수（圣水）", "서울 성동구 성수동2가 289-257", "正餐", "蛤蜊刀削面、海鲜煎饼"], ["Milky shop（圣水）", "성수 밀키샵 Milky Shop ", "甜品", "焦糖黄油饼干"], ["standard bread（圣水）", "성수 스탠다드브레드", "甜品", "吐司"], ["The Royal Food and Drinky", "The Royal Food and Drinky Seoul", "咖啡/观景", "建议日落前后到访，主打景观"], ["Cliff", "서울 용산구 신흥로20길 45-1", "咖啡/观景", "主要为景观和拍照；建议下午4-5点到"], ["Nongdam 농담", "서울 용산구 이태원동 34-19", "正餐", "辣奶油意面，可考虑双拼"], ["김숙성 신용산점", "서울 용산구 한강대로38가길 7-22", "正餐", "猪牛套餐、明太子烤芝士、水芹菜煎饼、酱蟹盖饭"], ["24시뼈다귀감자탕", "서울 용산구 대사관로 73 1층", "正餐", "土豆脊骨汤；吃完可加炒饭"], ["장지녕간장게장 한남동점", "서울 용산구 독서당로 46 한남아이파크 지하1층", "海鲜", "酱蟹定食、蟹黄配米饭"], ["고반식당 新沙店", "서울 강남구 강남대로156길 34", "烤肉", "猪肉烤肉；多种小菜和蘸料"], ["Tulear", "서울 강남구 도산대로49길 39", "正餐", "牛油果泡菜炒饭、柠檬意大利面"], ["단골손님（新沙/驿三一带）", "서울 강남구 테헤란로1길 40", "正餐", "毛蚶生牛肉拌饭"], ["이가네갈비（明洞）", "명동 이가네갈비", "正餐", "辣炖排骨锅；汤汁可拌饭"], ["대한곱창 明洞店", "서울 중구 명동7길 18-1", "正餐", "华莎同款烤牛肠；可按喜好点拼盘"], ["乌达里家（明洞）", "서울 중구 명동8나길 28 2-3층", "海鲜", "酱蟹定食"], ["해묵 海木", "Haemok Haeundae", "正餐", "鳗鱼饭（히츠마부시）、Mochiri豆腐、奶油布拉塔奶酪、天妇罗"], ["형제육회（兄弟生拌牛肉）", "서울 종로구 종로 200-1", "正餐", "生牛肉拌饭、活章鱼；可配紫菜和香油"], ["순희네 빈대떡", "광장시장 순희네 빈대떡 ", "市场小吃", "绿豆煎饼"], ["박가네빈대떡", "박가네 빈대떡 광장시장", "市场小吃", "绿豆煎饼、肉饼"], ["母女紫菜包饭（모녀김밥）", "광장시장 모녀김밥", "市场小吃", "麻药紫菜包饭"], ["总角鲷鱼烧", "광장시장 총각네 붕어빵", "甜品", "红薯奶油芝士鲷鱼烧"], ["姜家炒年糕", "광장시장 강가네 떡볶이", "市场小吃", "炒年糕"], ["ILHO 일호상회", "광장시장 일호상회", "咖啡", "手冲咖啡、特调、咖啡豆"], ["프리미엄 규카츠 규도 마포공덕 본점（Gyudo）", "서울특별시 마포구 마포대로 33", "住宿附近", "牛排套餐"], ["EGGDROP 마포역점", "서울특별시 마포구 마포대로 68", "住宿附近", "韩式鸡蛋吐司三明治，适合快速早餐"], ["마포나루 도화본점（Mapo Naru）", "서울특별시 마포구 삼개로 11 | 11 Samgae-ro", "住宿附近", "2人：点1份主菜（炖鸡或菜包肉）+ 1份煎饼/主食即可"], ["호남식당（Honam Sikdang）", "서울특별시 마포구 마포대로6길 10 | 10 Mapo-daero 6-gil", "住宿附近", "本地汤饭店"], ["진대감 마포점（Jindaegam）", "서울특별시 마포구 마포대로12길 54-2", "住宿附近", "차돌삼합（牛胸肉搭配贝类及小菜）"], ["츠케루 공덕（Tsukeru Gongdeok）", "서울특별시 마포구 도화동 560", "住宿附近", "沾面、酱油拉面、拌面"], ["도화아파트먼트 마포（Dohwa Apartment Cafe）", "서울특별시 마포구 도화동 346-2", "住宿附近", "精品咖啡、甜点和烘焙"], ["李太祖脊骨汤 이대조뼈다귀（弘大）", "서울 마포구 동교로 196 1층", "正餐", "脊骨汤+蔬菜吸满汤汁，后半段加拉面；1989年老字号，人均1.2万~1.8万韩元"], ["無垢屋参鸡汤 무구옥（圣水店）", "서울 성동구 아차산로11길 11 1층 103호", "正餐", "参鸡汤套餐（含新芽人参+山参）+特制酱油蘸鸡肉；鸡肉和汤分开上桌；安国本店也有"], ["温6.5 온6.5（景福宫/北村）", "서울 종로구 북촌로1길 28", "正餐", "时令限酒+泡菜卷+海胆面；Dining Bar，人均6万~10万韩元"], ["Garlic Boy 갈릭보이（安国店）", "서울 종로구 율곡로 59-1", "小吃", "招牌蒜蓉奶油面包，多种口味分着吃；人均4千~7千韩元；广藏市场也有店"], ["Tteurak韩牛 뜨락（清潭洞）", "서울 강남구 영동대로142길 13-3", "烤肉", "韩牛安心里脊+自制比目鱼+腌菜+拌面或大酱汤收尾；人均10万~16万韩元；⚠️必须提前在Catchtable预约（无需韩国手机号），现场基本排不到"], ["MUTAN 무탄（汝矣岛）", "서울 영등포구 의사당대로 96 TP타워 2층 201、202호", "正餐", "牛排黑松露炸酱面+油淋鸡（配大量辣椒）；融合中餐，主厨上过《黑白大厨》"], ["江南面屋 강남면옥（新沙/狎鸥亭）", "서울 강남구 논현로152길 34 1층", "正餐", "冷面+炖排骨（不要点饺子汤）；排骨吃完不要收走酱汁，让店员用剩酱汁炒紫菜拌饭；人均3.5万~5万韩元"], ["Matina贵宾厅 마티나 라운지（仁川机场）", "인천공항 T1 마티나 라운지 / T2 마티나 라운지", "正餐", "自助餐，约30元人民币（某鱼上买票）；T1安检后4楼11号或43号登机口附近，T2安检后4楼252号登机口对面；热门时段排队，过安检后早点去"]];
+const list = document.getElementById("list"), chipsEl = document.getElementById("chips");
+const qEl = document.getElementById("q"), countEl = document.getElementById("count"), emptyEl = document.getElementById("empty");
+document.getElementById("total").textContent = FOOD.length;
+let active = "全部";
+const cats = ["全部", ...Object.entries(FOOD.reduce((a,r)=>(a[r[2]]=(a[r[2]]||0)+1,a),{})).sort((a,b)=>b[1]-a[1]).map(x=>x[0])];
+cats.forEach(c => {
+  const b = el("button",{class:"chip",type:"button","aria-pressed":c===active?"true":"false",text:c});
+  b.addEventListener("click",()=>{ active=c; [...chipsEl.children].forEach(x=>x.setAttribute("aria-pressed",x.textContent===c?"true":"false")); render(); });
+  chipsEl.append(b);
+});
+function goLink(q){ const w = el("span",{class:"golinks"}); w.append(link("谷歌地图",q), nvLink(q)); return w; }
+function render(){
+  const kw = qEl.value.trim().toLowerCase();
+  const rows = FOOD.filter(r => (active==="全部"||r[2]===active) && (!kw || r.join(" ").toLowerCase().includes(kw)));
+  list.replaceChildren(...rows.map(r => el("li",{},[
+    el("span",{class:"n",text:r[0]}),
+    goLink(r[1]),
+    ...(r[2]||r[3] ? [el("span",{class:"note",text:[r[2],r[3]].filter(Boolean).join("：")})] : [])
+  ])));
+  countEl.textContent = `显示 ${rows.length} 家`;
+  emptyEl.hidden = rows.length>0;
+}
+qEl.addEventListener("input",render);
+render();
+</script>
+</body>
+</html>
