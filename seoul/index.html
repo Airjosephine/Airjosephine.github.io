@@ -88,6 +88,7 @@ input[type=search]{width:100%;font:inherit;padding:10px 12px;border:1px solid va
 .golinks .nv{margin-left:0;font-size:13px;padding:0 6px}
 .empty{padding:24px 0;color:var(--muted)}
 .shop-group{margin:18px 0 24px}
+.shop-jump{font-size:12px;white-space:nowrap;margin-left:8px}
 .shop-group h3{font:700 21px/1.35 var(--serif);margin:0 0 8px;padding-bottom:7px;border-bottom:1px solid var(--line)}
 .shop-group .list{margin-top:0}
 footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
@@ -170,7 +171,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
 
 <section id="shop">
   <h2>购物</h2>
-  <p class="sub">共 <span id="shoptotal">0</span> 家，按区域整理。Google Maps 按店名搜索，Naver Maps 使用韩文搜索词。</p>
+  <p class="sub">共 <span id="shoptotal">0</span> 家，按区域整理。Google Maps 直接按店名搜索，方便查看店铺详情和 Menu；Naver Maps 使用韩文搜索词。</p>
   <div id="shopSessions"></div>
   <p class="empty" id="shopempty" hidden>还没有购物的地点。</p>
 </section>
@@ -252,7 +253,7 @@ DAYS.forEach(d => {
   d.items.forEach(it => {
     const body = el("p",{class:"what"});
     body.append(it.text);
-    if (it.place) { body.append(" "); body.append(linkBoth(it.place,it.q)); }
+    if (it.place) { body.append(" "); body.append(linkBoth(it.place,it.q)); if (it.place.includes("现代百货")) { body.append(" "); body.append(shopJump("狎鸥亭 / 新沙")); } }
     if (it.note || it.picks) {
       const s = el("small");
       if (it.note) s.append(it.note);
@@ -291,7 +292,16 @@ let FOOD = [];
 const list = document.getElementById("list"), chipsEl = document.getElementById("chips");
 const qEl = document.getElementById("q"), countEl = document.getElementById("count"), emptyEl = document.getElementById("empty");
 let active = "全部";
-function goLink(name,q){ const w = el("span",{class:"golinks"}); w.append(link("谷歌地图",name || q), nvLink(q || name)); return w; }
+function goLink(name,q){
+  const w = el("span",{class:"golinks"});
+  // Google Maps must search the actual business name, not its address or the label "谷歌地图".
+  w.append(el("a",{href:gm(name || q),target:"_blank",rel:"noopener",text:"谷歌地图"}), nvLink(q || name));
+  return w;
+}
+function shopJump(area){
+  const ids = {"狎鸥亭 / 新沙":"apgujeong-sinsa","明洞":"myeongdong","汝矣岛":"yeouido","汉南洞":"hannam","东大门":"dongdaemun","其他购物":"other"};
+  return el("a",{class:"shop-jump",href:"#shop-"+(ids[area]||"other"),text:"查看购物板块 ↗"});
+}
 function render(){
   const kw = qEl.value.trim().toLowerCase();
   const rows = FOOD.filter(r => (active==="全部"||r[2]===active) && (!kw || r.join(" ").toLowerCase().includes(kw)));
