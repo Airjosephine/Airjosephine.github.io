@@ -87,6 +87,9 @@ input[type=search]{width:100%;font:inherit;padding:10px 12px;border:1px solid va
 .nv{font-size:12px;border:1px solid var(--line);border-radius:4px;padding:0 5px;margin-left:6px;text-decoration:none;white-space:nowrap}
 .golinks .nv{margin-left:0;font-size:13px;padding:0 6px}
 .empty{padding:24px 0;color:var(--muted)}
+.shop-group{margin:18px 0 24px}
+.shop-group h3{font:700 21px/1.35 var(--serif);margin:0 0 8px;padding-bottom:7px;border-bottom:1px solid var(--line)}
+.shop-group .list{margin-top:0}
 footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
 @media (max-width:560px){
   .rgrid{grid-template-columns:44px repeat(5,1fr)}
@@ -167,8 +170,8 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
 
 <section id="shop">
   <h2>购物</h2>
-  <p class="sub">想逛的店，共 <span id="shoptotal">0</span> 处。数据和餐厅清单在同一个 CSV 里，分类写成“活动/购物”的行会显示在这里。</p>
-  <ul class="list" id="shoplist"></ul>
+  <p class="sub">共 <span id="shoptotal">0</span> 家，按区域整理。Google Maps 按店名搜索，Naver Maps 使用韩文搜索词。</p>
+  <div id="shopSessions"></div>
   <p class="empty" id="shopempty" hidden>还没有购物的地点。</p>
 </section>
 
@@ -235,7 +238,7 @@ const el = (tag, attrs={}, kids=[]) => {
 };
 const nm = q => "https://map.naver.com/p/search/" + encodeURIComponent(q);
 const nvLink = q => el("a",{class:"nv",href:nm(q),target:"_blank",rel:"noopener",title:"在 Naver 地图中搜索",text:"네이버"});
-const link = (text,q) => el("a",{href:gm(q),target:"_blank",rel:"noopener",text});
+const link = (text,q) => el("a",{href:gm(text || q),target:"_blank",rel:"noopener",text});
 const linkBoth = (text,q) => { const f = document.createDocumentFragment(); f.append(link(text,q), nvLink(q)); return f; };
 
 const dl = document.getElementById("daylist");
@@ -288,28 +291,48 @@ let FOOD = [];
 const list = document.getElementById("list"), chipsEl = document.getElementById("chips");
 const qEl = document.getElementById("q"), countEl = document.getElementById("count"), emptyEl = document.getElementById("empty");
 let active = "全部";
-function goLink(q){ const w = el("span",{class:"golinks"}); w.append(link("谷歌地图",q), nvLink(q)); return w; }
+function goLink(name,q){ const w = el("span",{class:"golinks"}); w.append(link("谷歌地图",name || q), nvLink(q || name)); return w; }
 function render(){
   const kw = qEl.value.trim().toLowerCase();
   const rows = FOOD.filter(r => (active==="全部"||r[2]===active) && (!kw || r.join(" ").toLowerCase().includes(kw)));
   list.replaceChildren(...rows.map(r => el("li",{},[
     el("span",{class:"n",text:r[0]}),
-    goLink(r[1] || r[0]),
+    goLink(r[0], r[1] || r[0]),
     ...(r[2]||r[3] ? [el("span",{class:"note",text:[r[2],r[3]].filter(Boolean).join("：")})] : [])
   ])));
   countEl.textContent = `显示 ${rows.length} 家`;
   emptyEl.textContent = "没有匹配的店，换个关键词试试。";
   emptyEl.hidden = rows.length>0;
 }
+function shopArea(name){
+  if (["狎鸥亭现代百货","Stussy Seoul","Supreme Seoul","Palace Seoul"].some(x=>name.includes(x))) return "狎鸥亭 / 新沙";
+  if (name.includes("明洞")) return "明洞";
+  if (name.includes("汝矣岛")) return "汝矣岛";
+  if (name.includes("汉南")) return "汉南洞";
+  if (name.includes("东大门")) return "东大门";
+  return "其他购物";
+}
+const SHOP_FALLBACK = [{"name": "狎鸥亭现代百货", "q": "서울특별시 강남구 압구정로 165", "note": "百货商场；可结合狎鸥亭、岛山公园一带安排 活动/装饰日期：2026-11-01至2026-12-31", "area": "狎鸥亭 / 新沙"}, {"name": "Stussy Seoul（狎鸥亭）", "q": "Stussy Seoul 압구정", "note": "首尔唯一直营店，有首尔城市限定系列。狎鸥亭罗德奥站5号口步行8到10分钟；11:00-20:00全年无休；B1滑板配件、1楼主卖场（限定款单独陈列）、2楼咖啡区。不能退税，微信支付说法不一，带信用卡兜底；开门早到或18点后排队更短。同一条街顺路：Supreme、Palace，三家约2小时", "area": "狎鸥亭 / 新沙"}, {"name": "Supreme Seoul（狎鸥亭）", "q": "Supreme 압구정", "note": "和Stussy在同一条街，基本不用排队，款式偏常规，旁边就是LV；店员耐心", "area": "狎鸥亭 / 新沙"}, {"name": "Palace Seoul（狎鸥亭）", "q": "Palace 압구정", "note": "随便进不用等，款式多，有Nike联名；2楼有大公仔可以拍照", "area": "狎鸥亭 / 新沙"}, {"name": "The North Face White Label 明洞新世界百货", "q": "신세계백화점 본점 노스페이스 화이트라벨", "note": "百货里的折扣区比旗舰店划算：黑标约有30%到40%折扣，叠加金卡再打折，还能退税", "area": "明洞"}, {"name": "汝矣岛现代百货（北面白标+Carhartt）", "q": "더현대 서울 노스페이스 화이트라벨", "note": "4楼北面白标，店员会说英语和中文，款式在国内少见；Carhartt也在同一栋三层楼里。汝矣岛已收录：MUTAN、NOCT", "area": "汝矣岛"}, {"name": "The North Face 汉南店", "q": "노스페이스 한남 이태원로 227", "note": "偶尔有VENTUS限定发售，现场排队、限购一件。笔记里写的区名是성북구，但汉南洞属于龙山区，请到地图上核对位置", "area": "汉南洞"}, {"name": "The North Face 明洞旗舰店（4层）/ 东大门专门店", "q": "노스페이스 명동 / 노스페이스 동대문", "note": "款式最全，支持现场退税", "area": "明洞"}];
 function setupShop(rows){
-  const ul = document.getElementById("shoplist");
+  const host = document.getElementById("shopSessions");
+  const groups = new Map();
+  rows.forEach(r => { const a=r.area || "其他购物"; if(!groups.has(a)) groups.set(a,[]); groups.get(a).push(r); });
   document.getElementById("shoptotal").textContent = rows.length;
-  document.getElementById("shopempty").hidden = rows.length>0;
-  ul.replaceChildren(...rows.map(r => el("li",{},[
-    el("span",{class:"n",text:r[0]}),
-    goLink(r[1] || r[0]),
-    ...(r[3] ? [el("span",{class:"note",text:r[3]})] : [])
-  ])));
+  document.getElementById("shopempty").hidden = rows.length > 0;
+  const order = ["狎鸥亭 / 新沙","明洞","汝矣岛","汉南洞","东大门","其他购物"];
+  const ids = {"狎鸥亭 / 新沙":"apgujeong-sinsa","明洞":"myeongdong","汝矣岛":"yeouido","汉南洞":"hannam","东大门":"dongdaemun","其他购物":"other"};
+  const entries = [...groups.entries()].sort((a,b)=>order.indexOf(a[0])-order.indexOf(b[0]));
+  host.replaceChildren(...entries.map(([area,items])=>{
+    const section=el("div",{class:"shop-group",id:"shop-"+(ids[area]||"other")});
+    section.append(el("h3",{text:area}));
+    const ul=el("ul",{class:"list"});
+    ul.replaceChildren(...items.map(r=>el("li",{},[
+      el("span",{class:"n",text:r.name}),
+      goLink(r.name,r.q||r.name),
+      ...(r.note?[el("span",{class:"note",text:r.note})]:[])
+    ])));
+    section.append(ul); return section;
+  }));
 }
 function setup(){
   document.getElementById("total").textContent = FOOD.length;
@@ -331,12 +354,15 @@ fetch("Seoulrestaurants.csv",{cache:"no-cache"})
       .map(r => [r[0]||"", r[1]||"", r[2]||"", r[3]||""])
       .filter(r => r[0].trim() && !r[2].startsWith("住宿/") && !r[2].startsWith("活动"));
     setup();
-    setupShop(parseCSV(t).slice(1).map(r => [r[0]||"", r[1]||"", r[2]||"", r[3]||""]).filter(r => r[0].trim() && (r[2]==="活动/购物" || r[2].startsWith("购物"))));
+    setupShop(parseCSV(t).slice(1).map(r => ({name:r[0]||"",q:r[1]||"",category:r[2]||"",note:r[3]||"",area:shopArea(r[0]||"")})).filter(r => r.name.trim() && (r.category==="活动/购物" || r.category.startsWith("购物"))));
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView(); }));
   })
   .catch(() => {
     document.getElementById("total").textContent = "0";
-    emptyEl.textContent = "餐厅清单没有加载出来。请确认 seoul 文件夹里有 Seoulrestaurants.csv，并且是在网站上打开（不是直接双击本地文件）。";
+    emptyEl.textContent = "本地预览模式下浏览器限制读取 CSV，餐厅列表无法加载；购物清单仍可正常查看。上传到 GitHub Pages 后餐厅列表会正常加载。";
     emptyEl.hidden = false;
+    setupShop(SHOP_FALLBACK);
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView(); }));
   });
 </script>
 </body>
