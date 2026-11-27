@@ -103,7 +103,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
   <h1>首尔四天</h1>
   <p class="lede">11月27日至12月1日。Jo 从多伦多出发，Long 从北京飞来，28日晚在首尔汇合，12月1日 Long 先回，Jo 继续留在首尔。</p>
   <nav class="top" aria-label="页面导航">
-    <a href="../">所有旅行</a><a href="#flights">航班</a><a href="#days">每日行程</a><a href="#map">地图</a><a href="#food">餐厅清单</a>
+    <a href="../index.html">所有旅行</a><a href="#flights">航班</a><a href="#days">每日行程</a><a href="#map">地图</a><a href="#food">餐厅清单</a><a href="#shop">购物</a>
   </nav>
 
   <div class="ribbon" role="img" aria-label="两个人的时间线：Jo 11月27日出发、28日抵达首尔并留到12月1日之后；Long 28日从北京抵达、12月1日返程；两人28日晚汇合后同行。">
@@ -164,6 +164,14 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
   <ul class="list" id="list"></ul>
   <p class="empty" id="empty" hidden>没有匹配的店，换个关键词试试。</p>
 </section>
+
+<section id="shop">
+  <h2>购物</h2>
+  <p class="sub">想逛的店，共 <span id="shoptotal">0</span> 处。数据和餐厅清单在同一个 CSV 里，分类写成“活动/购物”的行会显示在这里。</p>
+  <ul class="list" id="shoplist"></ul>
+  <p class="empty" id="shopempty" hidden>还没有购物的地点。</p>
+</section>
+
 
 
 <footer>最后更新 2026年11月26日。行程是草稿，随时会调整。</footer>
@@ -293,6 +301,16 @@ function render(){
   emptyEl.textContent = "没有匹配的店，换个关键词试试。";
   emptyEl.hidden = rows.length>0;
 }
+function setupShop(rows){
+  const ul = document.getElementById("shoplist");
+  document.getElementById("shoptotal").textContent = rows.length;
+  document.getElementById("shopempty").hidden = rows.length>0;
+  ul.replaceChildren(...rows.map(r => el("li",{},[
+    el("span",{class:"n",text:r[0]}),
+    goLink(r[1] || r[0]),
+    ...(r[3] ? [el("span",{class:"note",text:r[3]})] : [])
+  ])));
+}
 function setup(){
   document.getElementById("total").textContent = FOOD.length;
   const counts = FOOD.reduce((a,r)=>(a[r[2]]=(a[r[2]]||0)+1,a),{});
@@ -313,6 +331,7 @@ fetch("Seoulrestaurants.csv",{cache:"no-cache"})
       .map(r => [r[0]||"", r[1]||"", r[2]||"", r[3]||""])
       .filter(r => r[0].trim() && !r[2].startsWith("住宿/") && !r[2].startsWith("活动"));
     setup();
+    setupShop(parseCSV(t).slice(1).map(r => [r[0]||"", r[1]||"", r[2]||"", r[3]||""]).filter(r => r[0].trim() && (r[2]==="活动/购物" || r[2].startsWith("购物"))));
   })
   .catch(() => {
     document.getElementById("total").textContent = "0";
